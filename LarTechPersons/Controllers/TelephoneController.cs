@@ -18,10 +18,20 @@ namespace LarTechPersons.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public IActionResult Get([FromQuery] string filter = "")
         {
-            var telephones = _telephoneRepository.GetAll();
-            return Ok(telephones);
+            if (filter == "NoUser")
+            {
+                var telephonesWithoutUser = _telephoneRepository
+                    .GetAll()
+                    .Where(t => t.PersonId == null);
+                return Ok(telephonesWithoutUser);
+            }
+            else
+            {
+                var telephones = _telephoneRepository.GetAll();
+                return Ok(telephones);
+            }
         }
 
         [HttpGet("{id}")]

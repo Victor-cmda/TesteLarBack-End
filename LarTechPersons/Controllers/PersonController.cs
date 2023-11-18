@@ -11,10 +11,12 @@ namespace LarTechPersons.Controllers
     public class PersonController : ControllerBase
     {
         private readonly IPersonRepository _personRepository;
+        private readonly ITelephoneRepository _telephoneRepository;
 
-        public PersonController(IPersonRepository personRepository)
+        public PersonController(IPersonRepository personRepository, ITelephoneRepository telephoneRepository)
         {
             _personRepository = personRepository;
+            _telephoneRepository = telephoneRepository;
         }
 
         [HttpGet]
@@ -32,6 +34,7 @@ namespace LarTechPersons.Controllers
             {
                 return NotFound();
             }
+
             return Ok(person);
         }
 
@@ -40,9 +43,33 @@ namespace LarTechPersons.Controllers
         {
             if (ModelState.IsValid)
             {
-                _personRepository.Add(person);
+                var personToAdd = new Person()
+                {
+                    Name = person.Name,
+                    Active = person.Active,
+                    Cpf = person.Cpf,
+                    DateBirthday = person.DateBirthday,
+                    CreatedAt = person.CreatedAt,
+                    UpdatedAt = person.UpdatedAt,
+                };
+                _personRepository.Add(personToAdd);
+                
+                if (person.Telephones != null)
+                {
+                    foreach (var telephone in person.Telephones)
+                    {
+                        var existingTelephone = _telephoneRepository.GetById(telephone.Id);
+                        if (existingTelephone != null)
+                        {
+                            existingTelephone.PersonId = personToAdd.Id;
+                            _telephoneRepository.Update(existingTelephone);
+                        }
+                    }
+                }
+
                 return CreatedAtAction("GetById", new { id = person.Id }, person);
             }
+
             return BadRequest(ModelState);
         }
 
@@ -56,9 +83,45 @@ namespace LarTechPersons.Controllers
 
             if (ModelState.IsValid)
             {
-                _personRepository.Update(person);
+                var existingPerson = _personRepository.GetById(person.Id);
+
+                if (existingPerson == null)
+                {
+                    return NotFound();
+                }
+
+                foreach (var existingTelephone in existingPerson.Telephones.ToList())
+                {
+                    existingTelephone.PersonId = null;
+                    _telephoneRepository.Update(existingTelephone);
+                }
+
+                foreach (var telephone in person.Telephones)
+                {
+                    var existingTelephone = _telephoneRepository.GetById(telephone.Id);
+                    if (existingTelephone != null)
+                    {
+                        existingTelephone.Number = telephone.Number;
+                        existingTelephone.TypeNumber = telephone.TypeNumber;
+                        existingTelephone.PersonId = person.Id;
+                        _telephoneRepository.Update(existingTelephone);
+                    }
+                    else
+                    {
+                        telephone.PersonId = person.Id;
+                        _telephoneRepository.Add(telephone);
+                    }
+                }
+
+                existingPerson.Name = person.Name;
+                existingPerson.Cpf = person.Cpf;
+                existingPerson.DateBirthday = person.DateBirthday;
+                existingPerson.Active = person.Active;
+
+                _personRepository.Update(existingPerson);
                 return NoContent();
             }
+
             return BadRequest(ModelState);
         }
 

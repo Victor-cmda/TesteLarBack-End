@@ -14,7 +14,7 @@ namespace LarTechPersons.Interfaces;
 
         public Person GetById(Guid id)
         {
-            return _context.Persons.FirstOrDefault(p => p.Id == id);
+            return _context.Persons.Include(x=>x.Telephones).FirstOrDefault(p => p.Id == id);
         }
 
         public IEnumerable<Person> GetAll()
