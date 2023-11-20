@@ -3,11 +3,13 @@ using LarTechPersons.Model;
 using System;
 using System.Collections.Generic;
 using LarTechPersons.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LarTechPersons.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class TelephoneController : ControllerBase
     {
         private readonly ITelephoneRepository _telephoneRepository;
