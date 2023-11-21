@@ -4,6 +4,6 @@ namespace LarTechPersons.Interfaces;
 
 public interface IUserRepository
 {
-    User GetByUsername(String username);
-    void Add(User user);
+    Task<User> GetByUsername(String username);
+    Task Add(User user);
 }

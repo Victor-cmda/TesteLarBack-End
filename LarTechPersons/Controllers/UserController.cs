@@ -17,9 +17,9 @@ public class UserController : Controller
     }
     
     [HttpPost]
-    public IActionResult AddUser([FromBody] User user)
+    public async Task<ActionResult> AddUser([FromBody] User user)
     {
-        var userDb = _userRepository.GetByUsername(user.Username);
+        var userDb = await _userRepository.GetByUsername(user.Username);
 
         if (userDb != null)
         {

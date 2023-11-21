@@ -20,16 +20,16 @@ namespace LarTechPersons.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            var persons = _personRepository.GetAll();
+            var persons = await _personRepository.GetAll();
             return Ok(persons);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(Guid id)
+        public async Task<IActionResult> GetById(Guid id)
         {
-            var person = _personRepository.GetById(id);
+            var person = await _personRepository.GetById(id);
             if (person == null)
             {
                 return NotFound();
@@ -39,7 +39,7 @@ namespace LarTechPersons.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody] Person person)
+        public async Task<IActionResult> Post([FromBody] Person person)
         {
             if (ModelState.IsValid)
             {
@@ -52,17 +52,17 @@ namespace LarTechPersons.Controllers
                     CreatedAt = person.CreatedAt,
                     UpdatedAt = person.UpdatedAt,
                 };
-                _personRepository.Add(personToAdd);
+                await _personRepository.Add(personToAdd);
                 
                 if (person.Telephones != null)
                 {
                     foreach (var telephone in person.Telephones)
                     {
-                        var existingTelephone = _telephoneRepository.GetById(telephone.Id);
+                        var existingTelephone = await _telephoneRepository.GetById(telephone.Id);
                         if (existingTelephone != null)
                         {
                             existingTelephone.PersonId = personToAdd.Id;
-                            _telephoneRepository.Update(existingTelephone);
+                            await _telephoneRepository.Update(existingTelephone);
                         }
                     }
                 }
@@ -74,7 +74,7 @@ namespace LarTechPersons.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(Guid id, [FromBody] Person person)
+        public async Task<IActionResult> Put(Guid id, [FromBody] Person person)
         {
             if (id != person.Id)
             {
@@ -83,7 +83,7 @@ namespace LarTechPersons.Controllers
 
             if (ModelState.IsValid)
             {
-                var existingPerson = _personRepository.GetById(person.Id);
+                var existingPerson = await _personRepository.GetById(person.Id);
 
                 if (existingPerson == null)
                 {
@@ -98,18 +98,18 @@ namespace LarTechPersons.Controllers
 
                 foreach (var telephone in person.Telephones)
                 {
-                    var existingTelephone = _telephoneRepository.GetById(telephone.Id);
+                    var existingTelephone = await _telephoneRepository.GetById(telephone.Id);
                     if (existingTelephone != null)
                     {
                         existingTelephone.Number = telephone.Number;
                         existingTelephone.TypeNumber = telephone.TypeNumber;
                         existingTelephone.PersonId = person.Id;
-                        _telephoneRepository.Update(existingTelephone);
+                        await _telephoneRepository.Update(existingTelephone);
                     }
                     else
                     {
                         telephone.PersonId = person.Id;
-                        _telephoneRepository.Add(telephone);
+                        await _telephoneRepository.Add(telephone);
                     }
                 }
 
@@ -118,7 +118,7 @@ namespace LarTechPersons.Controllers
                 existingPerson.DateBirthday = person.DateBirthday;
                 existingPerson.Active = person.Active;
 
-                _personRepository.Update(existingPerson);
+                await _personRepository.Update(existingPerson);
                 return NoContent();
             }
 
@@ -126,15 +126,15 @@ namespace LarTechPersons.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            var person = _personRepository.GetById(id);
+            var person = await _personRepository.GetById(id);
             if (person == null)
             {
                 return NotFound();
             }
 
-            _personRepository.Delete(id);
+            await _personRepository.Delete(id);
             return NoContent();
         }
     }

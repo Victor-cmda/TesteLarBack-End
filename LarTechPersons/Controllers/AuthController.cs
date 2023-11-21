@@ -17,9 +17,9 @@ public class AuthController : Controller
     }
     
     [HttpPost]
-    public IActionResult Auth([FromBody] User user)
+    public async Task<IActionResult> Auth([FromBody] User user)
     {
-        var userDb = _userRepository.GetByUsername(user.Username);
+        var userDb = await _userRepository.GetByUsername(user.Username);
 
         if (userDb == null)
         {

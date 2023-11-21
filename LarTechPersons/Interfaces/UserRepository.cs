@@ -1,5 +1,6 @@
 using LarTechPersons.Context;
 using LarTechPersons.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace LarTechPersons.Interfaces;
 
@@ -12,16 +13,16 @@ public class UserRepository : IUserRepository
         _context = context;    
     }
 
-    public User GetByUsername(String username)
+    public async Task<User> GetByUsername(String username)
     {
-        return _context.Users.FirstOrDefault(x => x.Username == username);
+        return await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
     }
 
-    public void Add(User user)
+    public async Task Add(User user)
     {
         user.Password = HashPassword(user.Password);
-        _context.Users.Add(user);
-        _context.SaveChanges();
+        await _context.Users.AddAsync(user);
+        await _context.SaveChangesAsync();
     }
     
     private string HashPassword(string password)

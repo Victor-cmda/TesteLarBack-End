@@ -4,9 +4,9 @@ namespace LarTechPersons.Interfaces;
 
 public interface IPersonRepository
 {
-    Person GetById(Guid id);
-    IEnumerable<Person> GetAll();
-    void Add(Person person);
-    void Update(Person person);
-    void Delete(Guid id);
+    Task<Person> GetById(Guid id);
+    Task<IEnumerable<Person>> GetAll();
+    Task Add(Person person);
+    Task Update(Person person);
+    Task Delete(Guid id);
 }

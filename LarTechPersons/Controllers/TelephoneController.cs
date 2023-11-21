@@ -20,26 +20,28 @@ namespace LarTechPersons.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get([FromQuery] string filter = "")
+        public async Task<IActionResult> Get([FromQuery] string filter = "")
         {
             if (filter == "NoUser")
             {
-                var telephonesWithoutUser = _telephoneRepository
-                    .GetAll()
-                    .Where(t => t.PersonId == null);
+                var telephonesWithoutUser = await _telephoneRepository
+                    .GetAll();
+                
+                telephonesWithoutUser = telephonesWithoutUser.Where(t => t.PersonId == null);
+                
                 return Ok(telephonesWithoutUser);
             }
             else
             {
-                var telephones = _telephoneRepository.GetAll();
+                var telephones = await _telephoneRepository.GetAll();
                 return Ok(telephones);
             }
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(Guid id)
+        public async Task<IActionResult> GetById(Guid id)
         {
-            var telephone = _telephoneRepository.GetById(id);
+            var telephone = await _telephoneRepository.GetById(id);
             if (telephone == null)
             {
                 return NotFound();
@@ -48,18 +50,18 @@ namespace LarTechPersons.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody] Telephone telephone)
+        public async Task<IActionResult> Post([FromBody] Telephone telephone)
         {
             if (ModelState.IsValid)
             {
-                _telephoneRepository.Add(telephone);
+                await _telephoneRepository.Add(telephone);
                 return CreatedAtAction("GetById", new { id = telephone.Id }, telephone);
             }
             return BadRequest(ModelState);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(Guid id, [FromBody] Telephone telephone)
+        public async Task<IActionResult> Put(Guid id, [FromBody] Telephone telephone)
         {
             if (id != telephone.Id)
             {
@@ -68,22 +70,22 @@ namespace LarTechPersons.Controllers
 
             if (ModelState.IsValid)
             {
-                _telephoneRepository.Update(telephone);
+                await _telephoneRepository.Update(telephone);
                 return NoContent();
             }
             return BadRequest(ModelState);
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            var telephone = _telephoneRepository.GetById(id);
+            var telephone = await _telephoneRepository.GetById(id);
             if (telephone == null)
             {
                 return NotFound();
             }
 
-            _telephoneRepository.Delete(id);
+            await _telephoneRepository.Delete(id);
             return NoContent();
         }
     }

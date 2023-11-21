@@ -12,35 +12,35 @@ namespace LarTechPersons.Interfaces;
             _context = context;
         }
 
-        public Person GetById(Guid id)
+        public async Task<Person> GetById(Guid id)
         {
-            return _context.Persons.Include(x=>x.Telephones).FirstOrDefault(p => p.Id == id);
+            return await _context.Persons.Include(x=>x.Telephones).FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public IEnumerable<Person> GetAll()
+        public async Task<IEnumerable<Person>> GetAll()
         {
-            return _context.Persons.ToList();
+            return await _context.Persons.ToListAsync();
         }
 
-        public void Add(Person person)
+        public async Task Add(Person person)
         {
-            _context.Persons.Add(person);
-            _context.SaveChanges();
+            await _context.Persons.AddAsync(person);
+            await _context.SaveChangesAsync();
         }
 
-        public void Update(Person person)
+        public async Task Update(Person person)
         {
             _context.Entry(person).State = EntityState.Modified;
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void Delete(Guid id)
+        public async Task Delete(Guid id)
         {
-            var person = _context.Persons.Find(id);
+            var person = await _context.Persons.FindAsync(id);
             if (person != null)
             {
                 _context.Persons.Remove(person);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
         }
     }
